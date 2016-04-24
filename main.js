@@ -7,9 +7,9 @@ function eventWindowLoaded() {
 	var gameOverSound = new Audio();
 	var imageElement = new Image();
 	var userPhoto = new Image();
-	selectSound.src = 'assets/sounds/mp3/select.mp3';
-	passedGameSound.src = 'assets/sounds/mp3/passedGame.mp3';
-	gameOverSound.src = 'assets/sounds/mp3/gameOver.mp3';
+	selectSound.src = 'https://cdn.rawgit.com/moczka/puzzle-game/master/assets/sounds/mp3/select.mp3';
+	passedGameSound.src = 'https://cdn.rawgit.com/moczka/puzzle-game/master/assets/sounds/mp3/passedGame.mp3';
+	gameOverSound.src = 'https://cdn.rawgit.com/moczka/puzzle-game/master/assets/sounds/mp3/gameOver.mp3';
 	imageElement.src = 'assets/defaultImage/defaultImage4.jpeg';
 	
 	//adds load event listeners
@@ -47,9 +47,9 @@ function eventWindowLoaded() {
 	function onAssetsLoad(e){
 	
 	if(passedGameSound.canPlayType('audio/mp3') == ""){
-	   		passedGameSound.src = 'assets/sounds/wav/passedGame.wav';
-			selectSound.src = 'assets/sounds/wav/select.wav';
-			gameOverSound.src = 'assets/sounds/wav/gameOver/wav';
+	   		passedGameSound.src = 'https://cdn.rawgit.com/moczka/puzzle-game/master/assets/sounds/wav/passedGame.wav';
+			selectSound.src = 'https://cdn.rawgit.com/moczka/puzzle-game/master/assets/sounds/wav/select.wav';
+			gameOverSound.src = 'https://cdn.rawgit.com/moczka/puzzle-game/master/assets/sounds/wav/gameOver.wav';
 			passedGameSound.addEventListener('load', onAssetsLoad, false);
 			selectSound.addEventListener('load', onAssetsLoad, false);
 			gameOverSound.addEventListener('load', onAssetsLoad, false);
@@ -213,7 +213,7 @@ function startScreen(){
 				}
 				
 				for(var a=0; a<italyCount; a++){
-					italyPictures.push({url:"assets/italy/italy"+a+".jpeg"});
+					italyPictures.push({url:"https://cdn.rawgit.com/moczka/puzzle-game/master/assets/italy/italy"+a+".jpeg"});
 				}
 				puzzleTheme.selected = true;
 				puzzleTheme.value = target.value;
@@ -226,7 +226,7 @@ function startScreen(){
 					initForm.setAttribute('style', '');
 				}
 				for(var i=0; i<newyorkCount; i++){
-					newyorkPictures.push({url:"assets/newyork/newyork"+i+".jpeg"});
+					newyorkPictures.push({url:"https://cdn.rawgit.com/moczka/puzzle-game/master/assets/newyork/newyork"+i+".jpeg"});
 				}
 				puzzleTheme.selected = true;
 				puzzleTheme.value = target.value;
@@ -242,7 +242,7 @@ function startScreen(){
 				}
 				
 				for(var j=0; j<landscapesCount; j++){
-					landscapesPictures.push({url:"assets/landscapes/landscape"+j+".jpeg"});
+		landscapesPictures.push({url:"https://cdn.rawgit.com/moczka/puzzle-game/master/assets/landscapes/landscape"+j+".jpeg"});
 				}
 				//puzzleTheme.selected = true;
 				//puzzleTheme.value = target.value;
