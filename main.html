@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Logic Photo Puzzle Game</title>
+<script src="main.js"></script>
+<link rel="stylesheet" href="main.css">
+</head>
+<body>
+<div class="canvas">
+<canvas id="canvasOne" width="700" height="550">
+ Your browser does not support the HTML 5 Canvas. 
+</canvas>
+<div id="initForm">
+	<!--<form autocomplete="off">-->
+		<h2>Difficulty:</h2>
+		<select id="difficulty" class="optionMenu">
+		<option value="select">Select</option>
+		<option value="hard">Hard</option>
+		<option value="medium">Medium</option>
+		<option value="easy">Easy</option>
+		</select>
+		<h2>Puzzle Theme:</h2>
+		<select id="puzzleTheme" class="optionMenu">
+		<option value="select">Select</option>
+		<option value="newyork">New York City</option>
+		<option value="italy">Italy</option>
+		<option value="landscapes">Landscapes</option>
+		<option value="userphoto">Your Photo</option>
+		</select>
+	<!--</form>-->
+	</div>
+	<div id="cameraHolder">
+		<!--<video src="" autoplay id="videoPhoto"></video>-->
+		<input type="button" id="takePhoto" class="menuButton" value="Take Photo"/>
+	</div>
+	<button id="beginButton" value="beginGame"  class="menuButton">Begin Game</button>
+	</div>
+	
+	<div id="puzzleMenu">
+		<form autocomplete="off">
+	<input type="button" value="Start"  class="menuButton" id="sortButton"/>
+	<input type="button" value="Give Up"  class="menuButton" id="giveupButton"/>
+	<input type="button" id="hintButton" class="menuButton" value="Hint"/>
+	<input type="button" id="mainMenu" class="menuButton" value="Main Menu"/>
+		</form>
+	</div>
+</body>
+</html>
+
+
+
+
