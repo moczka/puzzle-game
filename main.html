@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Logic Photo Puzzle Game</title>
-<script src="https://cdn.rawgit.com/moczka/puzzle-game/master/main.js"></script>
-<link rel="stylesheet" href="https://cdn.rawgit.com/moczka/puzzle-game/master/main.css">
+<script src="main.js"></script>
+<link rel="stylesheet" href="main.css">
 </head>
 <body>
 <div class="canvas">
@@ -12,7 +12,7 @@
  Your browser does not support the HTML 5 Canvas. 
 </canvas>
 <div id="initForm">
-	<!--<form autocomplete="off">-->
+	<form autocomplete="off">
 		<h2>Difficulty:</h2>
 		<select id="difficulty" class="optionMenu">
 		<option value="select">Select</option>
@@ -28,13 +28,17 @@
 		<option value="landscapes">Landscapes</option>
 		<option value="userphoto">Your Photo</option>
 		</select>
-	<!--</form>-->
+	</form>
 	</div>
 	<div id="cameraHolder">
 		<!--<video src="" autoplay id="videoPhoto"></video>-->
 		<input type="button" id="takePhoto" class="menuButton" value="Take Photo"/>
 	</div>
+	<div id="startButtons">
+	<a href="http://www.noxtar.com/search/label/Games" target="_blank" id="moreGames" class="menuButton">More Games</a>
 	<button id="beginButton" value="beginGame"  class="menuButton">Begin Game</button>
+	<a href="http://www.noxtar.com/p/contact-us.html" target="_blank" id="reportBug" class="menuButton">Report Bug</a>
+	</div>
 	</div>
 	
 	<div id="puzzleMenu">

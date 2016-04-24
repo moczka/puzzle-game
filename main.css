@@ -48,11 +48,26 @@ p{
 
 
 
-#beginButton{
+#startButtons{
+	width: 500px;
 	position: absolute;
 	bottom: 30px;
-	left: 300px;
+	left: 100px;
 }
+
+#startButtons button, #startButtons a{
+	float: left;
+    margin-left: 35px;
+}
+
+a.menuButton{
+	height: 20px;
+	padding-bottom: 5px;
+	padding-top: 5px;
+	text-align: center;
+}
+
+
 
 #initForm{
 	position: absolute;
