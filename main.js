@@ -46,7 +46,7 @@ function eventWindowLoaded() {
 	
 	function onAssetsLoad(e){
 	
-	if(passedGameSound.canPlayType('audio/mp3') == ""){
+	if(passedGameSound.canPlayType('audio/mp3') === ""){
 	   		passedGameSound.src = 'assets/sounds/wav/passedGame.wav';
 			selectSound.src = 'assets/sounds/wav/select.wav';
 			gameOverSound.src = 'assets/sounds/wav/gameOver.wav';
@@ -372,7 +372,6 @@ function beginGame() {
 	var puzzleSorted = false;
 	var userGaveUp = false;
 	var giveUserHint = false;
-	var cursorHoldingHint = false;
 	
 	
 	
@@ -390,8 +389,8 @@ function beginGame() {
 	var mainMenu = $('#mainMenu');
 	mainMenu.addEventListener('click', function(){window.location.reload();}, false);
 	var hintButton = $('#hintButton');
-	hintButton.addEventListener('mousedown', onHintDown, false);
-	hintButton.addEventListener('mouseup', onHintUp, false);
+	hintButton.addEventListener('click', onHintClick, false);
+	//hintButton.addEventListener('mouseup', onHintUp, false);
 	
 	
 	var puzzleTimer = new Timer();
@@ -457,7 +456,7 @@ function  drawScreen () {
 				}
 			}
 		}
-		  if(resultBoard.indexOf(false) == -1 && puzzleSorted && userGaveUp == false){
+		  if(resultBoard.indexOf(false) == -1 && puzzleSorted && userGaveUp === false){
 			  puzzleTimer.stop();
 			  gameOver = true;
 		  context.fillStyle = "#ff0000";
@@ -472,8 +471,6 @@ function  drawScreen () {
 		  context.font = "bold 50px helvetica";
 		  context.textAlign = "center";
 		  context.fillText("Game Over!", theCanvas.width/2, theCanvas.height/2);
-		gameOverSound.addEventListener('ended', function(){location.reload();}, false);
-			gameOverSound.play();
 			  puzzleTimer.stop();
 			  gameOver = true;
 		  }else{
@@ -486,7 +483,7 @@ function  drawScreen () {
 function randomizeBoard(board) {
 		var newBoard = [];
 		var cols = board.length;
-		var rows = board[0].length
+		var rows = board[0].length;
 		for (var i = 0; i < cols; i++) {
 			newBoard[i] = [];
 			for (var j =0; j < rows; j++) {
@@ -497,7 +494,7 @@ function randomizeBoard(board) {
 					rndCol = Math.floor(Math.random() * cols);
 					rndRow = Math.floor(Math.random() * rows);
 
-					if (board[rndCol][rndRow] != false) {
+					if (board[rndCol][rndRow] !== false) {
 						found = true;
 					}
 				}
@@ -517,10 +514,10 @@ function eventMouseUp(event) {
 		var mouseY;
 		var pieceX;
 		var pieceY;
-		if ( event.layerX ||  event.layerX == 0) { // Firefox
+		if ( event.layerX ||  event.layerX === 0) { // Firefox
    			mouseX = event.layerX ;
     		mouseY = event.layerY;
-  		} else if (event.offsetX || event.offsetX == 0) { // Opera
+  		} else if (event.offsetX || event.offsetX === 0) { // Opera
     		mouseX = event.offsetX;
     		mouseY = event.offsetY;
   		}
@@ -541,7 +538,7 @@ function eventMouseUp(event) {
 				   }
 			   }
 			   if (board[c][r].selected) {
-			   		selectedList.push({col:c,row:r})
+			   		selectedList.push({col:c,row:r});
 			   }
 			
 			}				
@@ -560,24 +557,23 @@ function eventMouseUp(event) {
 		selectSound.play();
 	}
 	
-function onHintDown(e){
-	cursorHoldingHint = true;
-	if(cursorHoldingHint && numHints != 0){
-		giveUserHint = true;
+function onHintClick(e){
+	giveUserHint = !giveUserHint;
+	if(puzzleSorted && giveUserHint && numHints !== 0){
+		numHints--;
+		numHints = (numHints<0)? 0: numHints;
+		e.target.innerHTML = "Hint ON";
+		drawScreen();
+	}else if(numHints <= 0){
+		e.target.innerHTML = "Hint OFF";
+		e.target.disabled = true;
 		drawScreen();
 	}else{
-		e.target.disabled = true;
+		e.target.innerHTML = "Hint OFF";
+		drawScreen();
 	}
 }
-	
-function onHintUp(e){
-	numHints--;
-	numHints = (numHints<0)? 0: numHints;
-	cursorHoldingHint = false;
-	giveUserHint = false;
-	drawScreen();
-}
-	
+		
 function setDifficulty(difficulty){
 		switch(difficulty){
 			case "easy":
@@ -635,7 +631,7 @@ function setNextLevel(e){
 	numHints = 5;
 	userGaveUp = false;
 	puzzleSorted = false;
-	sortButton.value = "Start";
+	sortButton.innerHTML = "Start";
 	sortButton.disabled = false;
 	puzzleTimer.displayTime = "Time: 0:0";
 	imageElement = setLevelImage(imageElement, puzzleTheme, currentLevel);
@@ -651,7 +647,7 @@ function setNextLevel(e){
 function onSort(e){
 	puzzleTimer.start();
 	var target = e.target;
-	target.value = "Sorted";
+	target.innerHTML = "Sorted";
 	target.disabled = true;
 	board = randomizeBoard(board);
 	puzzleSorted = true;
@@ -659,11 +655,16 @@ function onSort(e){
 	
 	}
 function onGiveUp(e){
+	if(puzzleSorted){
 	board = resetBoard(board);
 	sortButton.disabled = false;
-	sortButton.value = "Start";
-	userGaveUp = true;
-	drawScreen();
+	sortButton.innerHTML = "Start";
+	userGaveUp = true;	
+	gameOverSound.play();	
+		drawScreen();
+	gameOverSound.addEventListener('ended', function(){location.reload();}, false);
+	}
+
 }
 function resetBoard(board){
 	for (var i = 0; i < cols; i++) {
@@ -701,7 +702,7 @@ function prepareImage(image){
 			image.src = defaultImage.src;
 			image.centerOffsetX = 0;
 			image.centerOffsetY = 0;
-		}
+		};
 	}else{
 		
 		image.centerOffsetX = (Number(image.width)/2)-(minWidth/2);
@@ -725,7 +726,7 @@ function Webcam(audioB, videoB){
 	this.begin = function(){
 		if(navigator.getUserMedia){
 			//Added extra if statmenet because mozilla has its own version of the getUserMedia function
-			if(navigator.mediaDevices.getUserMedia != undefined){
+			if(navigator.mediaDevices.getUserMedia !== undefined){
 				var mozCam = navigator.mediaDevices.getUserMedia({audio:audioB, video:videoB});
 				mozCam.then(successCall);
 				mozCam.catch(failCall);
@@ -769,7 +770,7 @@ function Webcam(audioB, videoB){
 				mediaStream.getTracks()[i].stop();
 			}		
 		}
-	}
+	};
 }
 function $(selector){
 	return document.querySelector(selector);
@@ -797,27 +798,11 @@ function Timer(){
 				window.setTimeout(addTime, 1000);
 				}
 			}
-		}
+		};
 		this.stop = function(){
 			self.running = false;
-		}
+		};
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
