@@ -341,8 +341,8 @@ function beginGame() {
 	//piece width and height
 	var startXOffset = 20;
 	var startYOffset = 40;
-	var partWidth = minWidth/cols;
-	var partHeight = minHeight/rows;
+	var partWidth;
+	var partHeight;
 	var currentLevel = 0;
 	var numHints = 5;
 	
