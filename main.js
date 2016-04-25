@@ -26,8 +26,8 @@ function eventWindowLoaded() {
 	var gameOver = false;
 	var drawFunction;
 
-	var minWidth = 650;
-	var minHeight = 450;
+	var minWidth = 653;
+	var minHeight = 453;
 	
 	//image information and level difficulty
 	var italyPictures = [];
@@ -330,20 +330,6 @@ function startScreen(){
 	
 }
 
-
-
-
-
-
-
-
-	
-
-	
-
-
-
-
 function beginGame() {
 	
 	//Puzzle Settings
@@ -390,7 +376,6 @@ function beginGame() {
 	mainMenu.addEventListener('click', function(){window.location.reload();}, false);
 	var hintButton = $('#hintButton');
 	hintButton.addEventListener('click', onHintClick, false);
-	//hintButton.addEventListener('mouseup', onHintUp, false);
 	
 	
 	var puzzleTimer = new Timer();
@@ -420,6 +405,9 @@ function  drawScreen () {
 	  	context.fillText(puzzleTimer.displayTime, 2*theCanvas.width/4, 30);
 		//Hints
 		context.fillText("Hints: "+numHints, 3*theCanvas.width/4, 30);
+	
+		
+	
 	 
 		for (var c = 0; c < cols; c++) {
 			for (var r = 0; r < rows; r++) {
@@ -429,9 +417,13 @@ function  drawScreen () {
 				var imageY = tempPiece.finalRow*partHeight ;
 				var placeX = c*partWidth+c*xPad+startXOffset;
 				var placeY = r*partHeight+r*yPad+startYOffset;
-				//context.drawImage(videoElement , imageX, imageY, partWidth, partHeight);
-				context.drawImage(imageElement, imageX, imageY, partWidth, partHeight, placeX, placeY, partWidth, partHeight);
+				
+				context.drawImage(imageElement, imageX,  imageY, partWidth, partHeight, placeX, placeY, partWidth, partHeight);
+				
 				if (tempPiece.selected) {
+					
+				
+					
 					context.strokeStyle = '#FFFF00'; 
 					context.lineWidth = 5;
 					context.strokeRect( placeX,  placeY, partWidth, partHeight);
@@ -441,7 +433,7 @@ function  drawScreen () {
 		}
 	
 		if(giveUserHint){
-			context.drawImage(imageElement, startXOffset, startYOffset, minWidth+(xPad), minHeight+(yPad));
+			context.drawImage(imageElement, startXOffset, startYOffset, minWidth+10, minHeight+10);
 		}
 		
 		
@@ -595,10 +587,10 @@ function setDifficulty(difficulty){
 				break;
 				
 			case "hard":
-				rows = 10;
-				cols = 10;
-				xPad = 1;
-				yPad = 1;
+				rows = 7;
+				cols = 7;
+				xPad = 2;
+				yPad = 2;
 				partWidth = minWidth/cols;
 				partHeight = minHeight/rows;
 				break;	
