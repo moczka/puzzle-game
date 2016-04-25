@@ -26,8 +26,8 @@ function eventWindowLoaded() {
 	var gameOver = false;
 	var drawFunction;
 
-	var minWidth = 653;
-	var minHeight = 453;
+	var minWidth = 650;
+	var minHeight = 450;
 	
 	//image information and level difficulty
 	var italyPictures = [];
@@ -73,7 +73,7 @@ function startScreen(){
 	var cameraHolder = $('#cameraHolder');
 	var myWebcam = new Webcam(false);
 	var difficultyControl = $('#difficulty');
-	difficulty.addEventListener('change', onDifficultyChange, false);
+	difficultyControl.addEventListener('change', onDifficultyChange, false);
 	var puzzleThemeControl = $('#puzzleTheme');
 	puzzleThemeControl.addEventListener('change', onThemeChange, false);
 	var startButtons = $('#startButtons');
@@ -212,7 +212,7 @@ function startScreen(){
 				}
 				
 				for(var a=0; a<italyCount; a++){
-					italyPictures.push({url:"assets/italy/italy"+a+".jpeg"});
+					italyPictures.push("assets/italy/italy"+a+".jpeg");
 				}
 				puzzleTheme.selected = true;
 				puzzleTheme.value = target.value;
@@ -225,7 +225,7 @@ function startScreen(){
 					initForm.setAttribute('style', '');
 				}
 				for(var i=0; i<newyorkCount; i++){
-					newyorkPictures.push({url:"assets/newyork/newyork"+i+".jpeg"});
+					newyorkPictures.push("assets/newyork/newyork"+i+".jpeg");
 				}
 				puzzleTheme.selected = true;
 				puzzleTheme.value = target.value;
@@ -241,7 +241,7 @@ function startScreen(){
 				}
 				
 				for(var j=0; j<landscapesCount; j++){
-		landscapesPictures.push({url:"assets/landscapes/landscape"+j+".jpeg"});
+		landscapesPictures.push("assets/landscapes/landscape"+j+".jpeg");
 				}
 				//puzzleTheme.selected = true;
 				//puzzleTheme.value = target.value;
@@ -604,13 +604,16 @@ function setLevelImage(puzzleImage, puzzleTheme, level){
 		puzzleImage.src = userPhoto.src;
 			break;
 		case 'italy':
-		puzzleImage.src = italyPictures[level].url;	
+		italyPictures = randomizeImageArray(italyPictures);
+		puzzleImage.src = italyPictures[level];	
 			break;
 		case 'newyork':
-		puzzleImage.src = newyorkPictures[level].url;	
+		newyorkPictures = randomizeImageArray(newyorkPictures);
+		puzzleImage.src = newyorkPictures[level];	
 			break;
 		case 'landscapes':
-		puzzleImage.src = landscapesPictures[level].url;
+		landscapesPictures = randomizeImageArray(landscapesPictures);
+		puzzleImage.src = landscapesPictures[level];
 			break;
 	}
 	return puzzleImage;
@@ -767,6 +770,25 @@ function Webcam(audioB, videoB){
 function $(selector){
 	return document.querySelector(selector);
 }
+
+function randomizeImageArray(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+  return array;
+}
+
+
 function Timer(){
 		var self = this;
 		var seconds = 0;
