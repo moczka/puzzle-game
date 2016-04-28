@@ -41,9 +41,6 @@ function eventWindowLoaded() {
 	var puzzleDiff = {selected: false, value:undefined};
 	var puzzleTheme = {selected: false, value:undefined};
 	
-	
-	
-	
 	function onAssetsLoad(e){
 	
 	if(passedGameSound.canPlayType('audio/mp3') === ""){
@@ -55,6 +52,12 @@ function eventWindowLoaded() {
 			gameOverSound.addEventListener('load', onAssetsLoad, false);
 		
 	   }else{
+		   
+		passedGameSound.removeEventListener('load', onAssetsLoad, false);
+		selectSound.removeEventListener('load', onAssetsLoad, false);
+		gameOverSound.removeEventListener('load', onAssetsLoad, false);
+		imageElement.removeEventListener('load', onAssetsLoad, false);
+		   
 		startScreen();
 	   }
 	}
@@ -214,6 +217,8 @@ function startScreen(){
 				for(var a=0; a<italyCount; a++){
 					italyPictures.push("assets/italy/italy"+a+".jpeg");
 				}
+				
+				italyPictures = randomizeImageArray(italyPictures);
 				puzzleTheme.selected = true;
 				puzzleTheme.value = target.value;
 				break;
@@ -227,13 +232,14 @@ function startScreen(){
 				for(var i=0; i<newyorkCount; i++){
 					newyorkPictures.push("assets/newyork/newyork"+i+".jpeg");
 				}
+				
+				newyorkPictures = randomizeImageArray(newyorkPictures);
 				puzzleTheme.selected = true;
 				puzzleTheme.value = target.value;
 				break;
 				
 			case "landscapes":
-				puzzleTheme.selected = true;
-				puzzleTheme.value = target.value;
+				
 				if(myWebcam.running  || !myWebcam.support){
 					myWebcam.stop();
 					cameraHolder.setAttribute('style', '');
@@ -241,10 +247,12 @@ function startScreen(){
 				}
 				
 				for(var j=0; j<landscapesCount; j++){
-		landscapesPictures.push("assets/landscapes/landscape"+j+".jpeg");
+				landscapesPictures.push("assets/landscapes/landscape"+j+".jpeg");
 				}
-				//puzzleTheme.selected = true;
-				//puzzleTheme.value = target.value;
+				
+				landscapesPictures = randomizeImageArray(landscapesPictures);
+				puzzleTheme.selected = true;
+				puzzleTheme.value = target.value;
 				break;
 				
 			case "select":
@@ -258,6 +266,12 @@ function startScreen(){
 				break;
 		}
 	}
+	
+		function gameReady(){
+				imageElement.removeEventListener('load', gameReady, false);
+				beginGame();
+			}	
+	
 	function onBeginGame(e){
 		if(puzzleDiff.selected && puzzleTheme.selected){
 			//removes everything from the start game screen.
@@ -276,13 +290,21 @@ function startScreen(){
 				cameraHolder.removeChild(videoPhoto);
 				cameraHolder.removeChild(takePhoto);
 			}
-			
 			$('#puzzleMenu').setAttribute('style', 'display:block; visibility: visible;');
-			beginGame();
-		}else{
-			//
+			
+			imageElement = setLevelImage(imageElement, puzzleTheme, 0);
+			
+		
+			//begin game when first level image has loaded.
+			imageElement.addEventListener('load', gameReady, false);
+			
 		}
 	}
+	
+	
+	
+	
+	
 	function onTakePhoto(e){
 		e.target.value = "GOT IT!";
 		var photoCanvas = document.createElement('canvas');
@@ -292,42 +314,25 @@ function startScreen(){
 		photoContext.drawImage(videoPhoto, 0, 0);
 		userPhoto.src = photoCanvas.toDataURL('image/jpeg');
 		window.setTimeout(function(){e.target.value = "Take Photo";}, 300);
-		
-		
 	}
 	function checkBoundary(object){
 			if(object.x >= theCanvas.width - object.radius){
 				object.x = theCanvas.width - object.radius;
 				object.velX = -object.velX;
-				//object.velX *= object.elasticity;
-				//updateAngle(object);
-
-
+				
 			}else if(object.x <= object.radius){
 				object.x = object.radius;
 				object.velX = -object.velX;
-				//object.velX *= object.elasticity;
-				//updateAngle(object);
-				
 
 			}else if(object.y <= object.radius){
 				object.y = object.radius;
 				object.velY = -object.velY;
-				//object.velY *= object.elasticity;
-				//updateAngle(object);
-				
  
 			}else if(object.y >= theCanvas.height - object.radius){
 				object.y = theCanvas.height - object.radius;
 				object.velY = -object.velY;
-				//object.velY *= object.elasticity;
-				//updateAngle(object);
 			}
-		}	
-
-	
-	
-	
+		}		
 }
 
 function beginGame() {
@@ -343,12 +348,11 @@ function beginGame() {
 	var startYOffset = 40;
 	var partWidth;
 	var partHeight;
-	var currentLevel = 0;
 	var numHints = 5;
+	var currentLevel = 0;
+	var canvasMessage = "Good Job!";
 	
 	setDifficulty(puzzleDiff.value);
-	imageElement = setLevelImage(imageElement, puzzleTheme, currentLevel);
-	
 	
 	//Initialize Board
 	var board = [];
@@ -358,7 +362,10 @@ function beginGame() {
 	var puzzleSorted = false;
 	var userGaveUp = false;
 	var giveUserHint = false;
-	
+	var userBeatGame = false;
+	var puzzleSolved = false; 
+	var soundEnded = false;
+	var imageLoaded = false;
 	
 	
 	//need a functiont that will set up the array for the images to be used by the puzzle. 
@@ -381,10 +388,11 @@ function beginGame() {
 	var puzzleTimer = new Timer();
 	
 	FRAME_RATE = 1000;
+	drawFunction = drawScreen; 
+	gameOver = false; 
+	gameLoop();
 	
-	
-	imageElement.addEventListener('load', function(){ drawFunction = drawScreen; gameOver = false; gameLoop();}, false);
-	
+	console.log("THE BEGIN GAME FUNCTION HAS BEEN CALLED THE ONE DOING THE FIRST DRAWING!!");
 	
 
 function  drawScreen () {
@@ -421,9 +429,6 @@ function  drawScreen () {
 				context.drawImage(imageElement, imageX,  imageY, partWidth, partHeight, placeX, placeY, partWidth, partHeight);
 				
 				if (tempPiece.selected) {
-					
-				
-					
 					context.strokeStyle = '#FFFF00'; 
 					context.lineWidth = 5;
 					context.strokeRect( placeX,  placeY, partWidth, partHeight);
@@ -432,43 +437,50 @@ function  drawScreen () {
 			}
 		}
 	
+	
 		if(giveUserHint){
 			context.drawImage(imageElement, startXOffset, startYOffset, minWidth+10, minHeight+10);
 		}
 		
 		
 	  	  if(puzzleSorted){
-		var resultBoard = [];  
+		var resultBoard = []; 
 		for(var a = 0; a<board.length; a++){
 			for(var b = 0; b<board[0].length; b++){
 				if((board[a][b].finalRow == b) && (board[a][b].finalCol == a)){
 					resultBoard.push(true);
-				}else{
+					}else{
 					resultBoard.push(false);
+					}
 				}
 			}
-		}
-		  if(resultBoard.indexOf(false) == -1 && puzzleSorted && userGaveUp === false){
-			  puzzleTimer.stop();
-			  gameOver = true;
-		  context.fillStyle = "#ff0000";
-		  context.font = "bold 50px helvetica";
-		  context.textAlign = "center";
-		  context.fillText("Good Job!", theCanvas.width/2, theCanvas.height/2);
-			passedGameSound.play();
-			passedGameSound.addEventListener('ended', setNextLevel, false);  
+		puzzleSolved = (resultBoard.indexOf(false) == -1)? true: false;	    
+	  	}
+	
+		//sets font-text properties for the pass or fail message
+			context.fillStyle = "#ff0000";
+		  	context.font = "bold 50px helvetica";
+		  	context.textAlign = "center";
+	
+		if(puzzleSolved && puzzleSorted && userGaveUp === false){
+			puzzleTimer.stop();
+			gameOver = true;
+			gameLoop();
+			theCanvas.removeEventListener('mouseup', eventMouseUp, false);
+			
+			context.fillText(canvasMessage, theCanvas.width/2, theCanvas.height/2);
+			setNextLevel();
+	
 			  
-		  }else if(resultBoard.indexOf(false) == -1 && userGaveUp){
-		  context.fillStyle = "#ff0000";
-		  context.font = "bold 50px helvetica";
-		  context.textAlign = "center";
-		  context.fillText("Game Over!", theCanvas.width/2, theCanvas.height/2);
-			  puzzleTimer.stop();
-			  gameOver = true;
-		  }else{
-			  gameOver = false;
 		  }
-	  }
+			  
+		if(puzzleSolved && userGaveUp){
+		  	context.fillText("Game Over!", theCanvas.width/2, theCanvas.height/2);
+			puzzleTimer.stop();
+			gameOver = true;
+		  }
+	
+	//END OF DRAWSCREEN FUNCT
 	}
 	
 	
@@ -596,46 +608,68 @@ function setDifficulty(difficulty){
 				break;	
 		}
 	}
-	
-function setLevelImage(puzzleImage, puzzleTheme, level){
-	
-	switch(puzzleTheme.value){
-		case 'userphoto':
-		puzzleImage.src = userPhoto.src;
-			break;
-		case 'italy':
-		italyPictures = randomizeImageArray(italyPictures);
-		puzzleImage.src = italyPictures[level];	
-			break;
-		case 'newyork':
-		newyorkPictures = randomizeImageArray(newyorkPictures);
-		puzzleImage.src = newyorkPictures[level];	
-			break;
-		case 'landscapes':
-		landscapesPictures = randomizeImageArray(landscapesPictures);
-		puzzleImage.src = landscapesPictures[level];
-			break;
+
+	function onSoundEnd(){
+		passedGameSound.removeEventListener('ended', onSoundEnd, false);
+		soundEnded = true;
+		checkAssets();
 	}
-	return puzzleImage;
 	
-}
+	function onImageLoad(){
+		imageElement.removeEventListener('load', onImageLoad, false);
+		imageLoaded = true;
+		checkAssets();
+	}
 	
-function setNextLevel(e){
-	passedGameSound.removeEventListener('ended', setNextLevel, false);
-	currentLevel++;
-	numHints = 5;
-	userGaveUp = false;
-	puzzleSorted = false;
-	sortButton.innerHTML = "Start";
-	sortButton.disabled = false;
-	puzzleTimer.displayTime = "Time: 0:0";
-	imageElement = setLevelImage(imageElement, puzzleTheme, currentLevel);
-	imageElement.addEventListener('load', function(){
+	function checkAssets(){
+		if(soundEnded && imageLoaded){
+		canvasMessage = "Good Job!";
+		numHints = 5;
+		userGaveUp = false;
+		puzzleSorted = false;
+		puzzleSolved = false;
+		sortButton.innerHTML = "Start";
+		sortButton.disabled = false;
+		puzzleTimer.displayTime = "Time: 0:0";
+		board = resetBoard(board);
+		hintButton.disabled = false;
 		gameOver = false;
-		gameLoop();
-	}, false);
-	board = resetBoard(board);
-	hintButton.disabled = false;
+		gameLoop();	
+		theCanvas.addEventListener('mouseup', eventMouseUp, false);
+			}
+		}
+		
+function setNextLevel(){
+	soundEnded = false;
+	imageLoaded = false;
+	
+	currentLevel++;
+	if(currentLevel >= italyCount || currentLevel >= newyorkCount || currentLevel >= landscapesCount){
+			userBeatGame = true;
+			//Background
+			context.fillStyle = '#000';
+			context.fillRect(0, 0, theCanvas.width, theCanvas.height);
+			//Box
+			context.strokeStyle = 'rgba(0,0,150,0.5)';
+			context.lineWidth = 10;
+			context.strokeRect(0, 0, theCanvas.width, theCanvas.height);
+		
+			context.fillStyle = "#FF0000";
+			canvasMessage = "You Beat The Game!";
+			context.fillText(canvasMessage, theCanvas.width/2, (theCanvas.height/2 +30));
+			passedGameSound.play(); 
+			passedGameSound.addEventListener('ended', function(){
+				window.location.reload(); 
+			}, false);
+			currentLevel -=1;
+		}else{
+	imageElement = setLevelImage(imageElement, puzzleTheme, currentLevel);
+	imageElement.addEventListener('load', onImageLoad, false);
+	passedGameSound.play();
+	passedGameSound.addEventListener('ended', onSoundEnd, false);
+
+	}
+	
 	
 }	
 	
@@ -656,8 +690,8 @@ function onGiveUp(e){
 	sortButton.innerHTML = "Start";
 	userGaveUp = true;	
 	gameOverSound.play();	
-		drawScreen();
-	gameOverSound.addEventListener('ended', function(){location.reload();}, false);
+	drawScreen();
+	gameOverSound.addEventListener('ended', function(){window.location.reload();}, false);
 	}
 
 }
@@ -679,15 +713,8 @@ function gameLoop(){
 			drawFunction();
 	}
 }	
+
 	
-	
-	
-//end of window onloadevent function	
-}
-
-
-
-
 //Class & Outter Functions
 function prepareImage(image){
 	if(Number(image.width) < minWidth || Number(image.height) < minHeight ){
@@ -787,7 +814,25 @@ function randomizeImageArray(array) {
   }
   return array;
 }
-
+	
+function setLevelImage(puzzleImage, puzzleTheme, level){
+	
+	switch(puzzleTheme.value){
+		case 'userphoto':
+		puzzleImage.src = userPhoto.src;
+			break;
+		case 'italy':
+		puzzleImage.src = italyPictures[level];	
+			break;
+		case 'newyork':
+		puzzleImage.src = newyorkPictures[level];	
+			break;
+		case 'landscapes':
+		puzzleImage.src = landscapesPictures[level];
+			break;
+	}
+	return puzzleImage;	
+}
 
 function Timer(){
 		var self = this;
@@ -816,7 +861,8 @@ function Timer(){
 		this.stop = function(){
 			self.running = false;
 		};
-	}
-
-
-
+	}	
+	
+	
+//end of window onloadevent function	
+}
