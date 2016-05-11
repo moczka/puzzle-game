@@ -18,31 +18,34 @@ function eventWindowLoaded() {
 	gameOverSound.addEventListener('load', onAssetsLoad,false);
 	imageElement.addEventListener('load', onAssetsLoad, false);
 
-	
-	
 	var FRAME_RATE = 45;
 	var theCanvas = $('#canvasOne');
 	var context = theCanvas.getContext('2d');
 	var gameOver = false;
+	
+	//variable to hold the function that is called by gameLoop
 	var drawFunction;
 
 	var minWidth = 650;
 	var minHeight = 450;
 	
-	//image information and level difficulty
+	//image arrays for puzzle themes
 	var italyPictures = [];
 	var newyorkPictures = [];
 	var landscapesPictures = [];
 	
+	//number of pictures avaiable for each theme.
 	var newyorkCount = 18;
 	var italyCount = 45;
 	var landscapesCount = 30;
 	
+	//objects for the puzzle difficulty and puzzle theme.
 	var puzzleDiff = {selected: false, value:undefined};
 	var puzzleTheme = {selected: false, value:undefined};
 	
 	function onAssetsLoad(e){
 	
+		//if mp3 is not supported, change source for wav
 	if(passedGameSound.canPlayType('audio/mp3') === ""){
 	   		passedGameSound.src = 'assets/sounds/wav/passedGame.wav';
 			selectSound.src = 'assets/sounds/wav/select.wav';
@@ -52,28 +55,28 @@ function eventWindowLoaded() {
 			gameOverSound.addEventListener('load', onAssetsLoad, false);
 		
 	   }else{
-		   
+		  //removes event listeners once all assets have loaded.
 		passedGameSound.removeEventListener('load', onAssetsLoad, false);
 		selectSound.removeEventListener('load', onAssetsLoad, false);
 		gameOverSound.removeEventListener('load', onAssetsLoad, false);
 		imageElement.removeEventListener('load', onAssetsLoad, false);
-		   
+		 
+		   //calls the function that will draw the starting page.
 		startScreen();
 	   }
 	}
 	
 	
 function startScreen(){
+
 	
-	//window.addEventListener('click', function(){selectSound.play()}, false);
-	
-	
-	
+	//creates a variable for the div holding the option controls
 	var initForm = $('#initForm');
 	var videoPhoto;
 	
 	var takePhoto = $('#takePhoto');
 	var cameraHolder = $('#cameraHolder');
+	//creates a webcam object and sets audio to false.
 	var myWebcam = new Webcam(false);
 	var difficultyControl = $('#difficulty');
 	difficultyControl.addEventListener('change', onDifficultyChange, false);
@@ -109,7 +112,7 @@ function startScreen(){
 	
 	
 	
-	//sets the draw function
+	//sets the draw function to the welcomeDraw that draws the bubbles.
 	drawFunction = welcomeDraw;
 	
 	//starts the loop
@@ -121,14 +124,15 @@ function startScreen(){
 	var alphaSpeed = -0.02;
 	
 	function welcomeDraw(){
-		//clears canvas
 		
+		
+		//the intro image clears the canvas on every call.
 	context.drawImage(imageElement, 0, 0, theCanvas.width, theCanvas.height);
 	context.strokeStyle = 'rgba(0,0,150,0.5)';
 	context.lineWidth = 10;
 	context.strokeRect(0, 0, theCanvas.width, theCanvas.height);
 		
-	
+	//game name animation
 	context.fillStyle = 'rgba(255,0,0,'+textAlpha+')';
 	context.font = "bold 50px Comic Sans MS";
 	context.textAlign = "center";
@@ -138,7 +142,7 @@ function startScreen(){
 	textAlpha += alphaSpeed;			
 	alphaSpeed = (textAlpha<= 0)? 0.02: (textAlpha>=1)? -0.02: alphaSpeed;	
 		
-		
+		//drawws the balls and checks for bouncing.
 			for(var j = 0; j<particles.length; j++){
 				var currentParticle = particles[j];
 				
@@ -154,13 +158,9 @@ function startScreen(){
 			context.fill();		
 			
 			}
-		
-		
-
-		
-		
 	}
 	
+	//the handler for the difficulty control
 	function onDifficultyChange(e){
 		var target = e.target;
 		switch(target.value){
@@ -183,6 +183,8 @@ function startScreen(){
 		}
 		
 	}
+	
+	//the handler for the theme control
 	function onThemeChange(e){
 		var target = e.target;
 		switch(target.value){
@@ -198,11 +200,10 @@ function startScreen(){
 				initForm.setAttribute('style', 'top:20px;');
 				cameraHolder.setAttribute('style', 'display: block; visibility: visible;');
 				
-				
 				}else{
+					//begins the webcam, a paragraph will be created since it is not supported
 					videoPhoto = myWebcam.begin();
 					takePhoto = cameraHolder.replaceChild(videoPhoto, takePhoto);
-					//takePhoto.setAttribute('style', 'display: none; visibility: hidden;');
 					cameraHolder.setAttribute('style', 'display: block; visibility: visible;');
 				}
 				break;
@@ -214,10 +215,12 @@ function startScreen(){
 					initForm.setAttribute('style', '');
 				}
 				
+				//cretes the url for each image and pushes it to the theme respective array.
 				for(var a=0; a<italyCount; a++){
 					italyPictures.push("assets/italy/italy"+a+".jpeg");
 				}
 				
+				//randomizes the array so always a different image will start.
 				italyPictures = randomizeImageArray(italyPictures);
 				puzzleTheme.selected = true;
 				puzzleTheme.value = target.value;
@@ -267,34 +270,44 @@ function startScreen(){
 		}
 	}
 	
-		function gameReady(){
-				imageElement.removeEventListener('load', gameReady, false);
-				beginGame();
-			}	
+	//will handle when the first level puzzle will load
+	function gameReady(){
+			imageElement.removeEventListener('load', gameReady, false);
+		//starts the actual game when the first level puzzle image has loaded. 
+			beginGame();
+	}	
 	
+	
+	//the begin game button handler
 	function onBeginGame(e){
+		
+		//onces a theme and difficulty setting has been selected, it will run this.
 		if(puzzleDiff.selected && puzzleTheme.selected){
 			//removes everything from the start game screen.
 			//particle = numParticles = startX = startY = textAlpha = alphaSpeed = undefined;
-			//difficultyControl.removeEventListener('click', onDifficultyChange, false);
-			//puzzleThemeControl.removeEventListener('click', onThemeChange, false);
+			
+			//removes the event listeners for each theme and difficulty controls.
+			difficultyControl.removeEventListener('click', onDifficultyChange, false);
+			puzzleThemeControl.removeEventListener('click', onThemeChange, false);
 			beginButton.removeEventListener('click', onBeginGame, false);
 			startButtons.setAttribute('style', 'display: none; visibility: hidden;');
 			initForm.setAttribute('style', 'display: none; visibility: hidden;');
 			gameOver = true;
 			gameLoop();
-			//difficultyControl = puzzleThemeControl = beginButton = undefined;
 			
+			//if the camera was running, it will stop it and hide the video and take photo button
 			if(myWebcam.running && myWebcam.support){
 				myWebcam.stop();
 				cameraHolder.removeChild(videoPhoto);
 				cameraHolder.removeChild(takePhoto);
 			}
+			
+			//hides the starting screen menu
 			$('#puzzleMenu').setAttribute('style', 'display:block; visibility: visible;');
 			
+			//sets the image element to the first image in the theme that was selected. 
 			imageElement = setLevelImage(imageElement, puzzleTheme, 0);
 			
-		
 			//begin game when first level image has loaded.
 			imageElement.addEventListener('load', gameReady, false);
 			
@@ -302,9 +315,7 @@ function startScreen(){
 	}
 	
 	
-	
-	
-	
+	//handles the take photo button
 	function onTakePhoto(e){
 		e.target.value = "GOT IT!";
 		var photoCanvas = document.createElement('canvas');
@@ -313,8 +324,12 @@ function startScreen(){
 		photoCanvas.height = 450;
 		photoContext.drawImage(videoPhoto, 0, 0);
 		userPhoto.src = photoCanvas.toDataURL('image/jpeg');
+		
+		//sets the button back to take photo after 300 mil seconds.
 		window.setTimeout(function(){e.target.value = "Take Photo";}, 300);
 	}
+	
+	//checks for balls hitting the canvas walls.
 	function checkBoundary(object){
 			if(object.x >= theCanvas.width - object.radius){
 				object.x = theCanvas.width - object.radius;
@@ -335,6 +350,8 @@ function startScreen(){
 		}		
 }
 
+	
+//function that begins the actual game
 function beginGame() {
 	
 	//Puzzle Settings
@@ -352,13 +369,16 @@ function beginGame() {
 	var currentLevel = 0;
 	var canvasMessage = "Good Job!";
 	
+	//sets the puzzle difficulty.
 	setDifficulty(puzzleDiff.value);
 	
 	//Initialize Board
 	var board = [];
 	
+	//resets the board to normal.
 	board = resetBoard(board);
 	
+	//booleans that represent important state of the game. 
 	var puzzleSorted = false;
 	var userGaveUp = false;
 	var giveUserHint = false;
@@ -368,11 +388,10 @@ function beginGame() {
 	var imageLoaded = false;
 	
 	
-	//need a functiont that will set up the array for the images to be used by the puzzle. 
-	//set up the timer so it returns back the fastest time it took the user to solve the puzzle. 
-	//add a timer for the hint
-	
+	//adds the event listener for clicks of the user selecting pieces.
 	theCanvas.addEventListener("mouseup",eventMouseUp, false);	
+	
+	//adds event listeners for the puzzle game buttons 
 	var sortButton = document.getElementById("sortButton");
 	sortButton.addEventListener("click", onSort, false);
 	sortButton.removeAttribute('disabled');
@@ -384,16 +403,15 @@ function beginGame() {
 	var hintButton = $('#hintButton');
 	hintButton.addEventListener('click', onHintClick, false);
 	
-	
+	//creates the timer that will time the user on each level. 
 	var puzzleTimer = new Timer();
 	
+	//changes the call rate for every second to improve performance to be only on par with the timer
 	FRAME_RATE = 1000;
+	//changes the gameLoop call function to the actual game draw Screen.
 	drawFunction = drawScreen; 
 	gameOver = false; 
 	gameLoop();
-	
-	console.log("THE BEGIN GAME FUNCTION HAS BEEN CALLED THE ONE DOING THE FIRST DRAWING!!");
-	
 
 function  drawScreen () {
 
@@ -414,12 +432,9 @@ function  drawScreen () {
 		//Hints
 		context.fillText("Hints: "+numHints, 3*theCanvas.width/4, 30);
 	
-		
-	
-	 
+		//draws each piece of the puzzle.
 		for (var c = 0; c < cols; c++) {
 			for (var r = 0; r < rows; r++) {
-				
 				var tempPiece  = board[c][r];
 				var imageX = tempPiece.finalCol*partWidth ;
 				var imageY = tempPiece.finalRow*partHeight ;
@@ -428,6 +443,7 @@ function  drawScreen () {
 				
 				context.drawImage(imageElement, imageX,  imageY, partWidth, partHeight, placeX, placeY, partWidth, partHeight);
 				
+				//if a piece has been selected, draw a yellow stroke.
 				if (tempPiece.selected) {
 					context.strokeStyle = '#FFFF00'; 
 					context.lineWidth = 5;
@@ -437,12 +453,13 @@ function  drawScreen () {
 			}
 		}
 	
-	
+		//if the user click to get a hint, show the actual picture.
 		if(giveUserHint){
 			context.drawImage(imageElement, startXOffset, startYOffset, minWidth+10, minHeight+10);
 		}
 		
 		
+		//once the puzzle has been sorted, check to see if it has been solved.
 	  	  if(puzzleSorted){
 		var resultBoard = []; 
 		for(var a = 0; a<board.length; a++){
@@ -454,6 +471,7 @@ function  drawScreen () {
 					}
 				}
 			}
+		//updates the varaible to reflect whether the puzzle is solved or not.
 		puzzleSolved = (resultBoard.indexOf(false) == -1)? true: false;	    
 	  	}
 	
@@ -462,28 +480,30 @@ function  drawScreen () {
 		  	context.font = "bold 50px helvetica";
 		  	context.textAlign = "center";
 	
+		//if the puzzle has been solved and the user has not given up, stop the timer and set the next level.
 		if(puzzleSolved && puzzleSorted && userGaveUp === false){
 			puzzleTimer.stop();
 			gameOver = true;
 			gameLoop();
+			//removes the click event listener so that the user cant click on the puzzle once it is solved.
 			theCanvas.removeEventListener('mouseup', eventMouseUp, false);
-			
 			context.fillText(canvasMessage, theCanvas.width/2, theCanvas.height/2);
-			setNextLevel();
-	
-			  
+			setNextLevel();  
 		  }
 			  
+	
+		//if the puzzle is solved but the user gave up, display a game over.
 		if(puzzleSolved && userGaveUp){
 		  	context.fillText("Game Over!", theCanvas.width/2, theCanvas.height/2);
 			puzzleTimer.stop();
+			//stop the timer and stop the gameLoop.
 			gameOver = true;
 		  }
 	
 	//END OF DRAWSCREEN FUNCT
 	}
 	
-	
+	//randomizes board 
 function randomizeBoard(board) {
 		var newBoard = [];
 		var cols = board.length;
@@ -512,6 +532,8 @@ function randomizeBoard(board) {
 	
 	}
 	
+	
+	//handles taps or clicks on the canvas
 function eventMouseUp(event) {
 		
 		var mouseX;
@@ -557,11 +579,13 @@ function eventMouseUp(event) {
 			board[selected2.col][selected2.row].selected = false;
 		}
 		
+		//update the canvas and play the select sound.
 		drawScreen();
 		selectSound.play();
 	}
 	
 function onHintClick(e){
+	//creates a toggle like effect
 	giveUserHint = !giveUserHint;
 	if(puzzleSorted && giveUserHint && numHints !== 0){
 		numHints--;
@@ -608,20 +632,27 @@ function setDifficulty(difficulty){
 				break;	
 		}
 	}
-
+	
+	
+	//handler when the passed Game sound is done playing.
 	function onSoundEnd(){
 		passedGameSound.removeEventListener('ended', onSoundEnd, false);
+		//set to true when sound is done playing
 		soundEnded = true;
+		//calls the check assets so that it runs the rest of teh code of the next level image function
 		checkAssets();
 	}
 	
+	//handles that the image is done loading
 	function onImageLoad(){
 		imageElement.removeEventListener('load', onImageLoad, false);
+		//sets tot true when the next image puzzle level has finished loading.
 		imageLoaded = true;
 		checkAssets();
 	}
 	
 	function checkAssets(){
+		//if the next level puzzle image has loaded and the passed level sound is done playing.
 		if(soundEnded && imageLoaded){
 		canvasMessage = "Good Job!";
 		numHints = 5;
@@ -635,14 +666,18 @@ function setDifficulty(difficulty){
 		hintButton.disabled = false;
 		gameOver = false;
 		gameLoop();	
+		//adds the mouseup event listener for the canvas again.
 		theCanvas.addEventListener('mouseup', eventMouseUp, false);
 			}
 		}
 		
 function setNextLevel(){
+	
+	//sets the next puzzle image level and played varaible to false.
 	soundEnded = false;
 	imageLoaded = false;
 	
+	//increates the level count by one. 
 	currentLevel++;
 	if(currentLevel >= italyCount || currentLevel >= newyorkCount || currentLevel >= landscapesCount){
 			userBeatGame = true;
@@ -663,6 +698,8 @@ function setNextLevel(){
 			}, false);
 			currentLevel -=1;
 		}else{
+			
+	//sets the image to the next image
 	imageElement = setLevelImage(imageElement, puzzleTheme, currentLevel);
 	imageElement.addEventListener('load', onImageLoad, false);
 	passedGameSound.play();
@@ -670,9 +707,9 @@ function setNextLevel(){
 
 	}
 	
-	
 }	
 	
+	//handles the sort button
 function onSort(e){
 	puzzleTimer.start();
 	var target = e.target;
@@ -683,6 +720,7 @@ function onSort(e){
 	drawScreen();
 	
 	}
+	//handles the give up button
 function onGiveUp(e){
 	if(puzzleSorted){
 	board = resetBoard(board);
@@ -695,6 +733,7 @@ function onGiveUp(e){
 	}
 
 }
+	//sets the board to solved
 function resetBoard(board){
 	for (var i = 0; i < cols; i++) {
 			board[i] = [];
